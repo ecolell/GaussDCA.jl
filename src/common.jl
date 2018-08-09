@@ -1,7 +1,6 @@
 include("unsafe_array.jl")
 using .Unsafe
 using Compat
-using Compat.LinearAlgebra
 
 const PACKBITS = 64
 const _u = 0x0084210842108421
@@ -59,13 +58,13 @@ end
 
 function remove_duplicate_seqs(Z::Matrix{Int8})
     N, M = size(Z)
-    hZ = Array{UInt}(undef, M)
+    hZ = Array{UInt}(M)
     @inbounds for i = 1:M
         hZ[i] = @hash(Z[:,i])
     end
     print("removing duplicate sequences... ")
 
-    ref_seq_ind = Array{Int}(undef, M)
+    ref_seq_ind = Array{Int}(M)
     ref_seq = Dict{UInt,Int}()
     @inbounds for i = 1:M
         ref_seq_ind[i] = get!(ref_seq, hZ[i], i)
@@ -83,7 +82,7 @@ function remove_duplicate_seqs(Z::Matrix{Int8})
     end
 
     if any(collided)
-        nowcollided = BitArray(undef, M)
+        nowcollided = BitArray(M)
         while any(collided)
             # Collect index of first row for each collided hash
             empty!(ref_seq)
@@ -153,9 +152,9 @@ function compute_FN(mJ::Matrix{Float64}, N::Int, q::Integer)
     q = Int(q)
     s = q - 1
 
-    mJij = Array{Float64}(undef, s, s)
-    amJi = Array{Float64}(undef, s)
-    amJj = Array{Float64}(undef, s)
+    mJij = Array{Float64}(s, s)
+    amJi = Array{Float64}(s)
+    amJj = Array{Float64}(s)
     fs = Float64(s)
     fs2 = Float64(s^2)
 
